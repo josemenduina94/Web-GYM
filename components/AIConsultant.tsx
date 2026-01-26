@@ -31,32 +31,32 @@ const AIConsultant: React.FC = () => {
           <div>
             <h2 className="text-4xl font-bold mb-6">Coach de Rendimiento <span className="text-red-500">AI</span></h2>
             <p className="text-zinc-400 mb-8 text-lg">
-              Obtén un punto de partida personalizado al instante. Cuéntale a nuestro coach inteligente tus metas y nivel actual.
+              Recibe asesoría profesional inmediata. Cuéntale a nuestra IA tus objetivos en Forza Cangas.
             </p>
             
-            <form onSubmit={handleSubmit} className="space-y-6 glass-morphism p-8 rounded-3xl">
+            <form onSubmit={handleSubmit} className="space-y-6 glass-morphism p-8 rounded-3xl border border-red-500/20">
               <div>
-                <label className="block text-sm font-semibold mb-2">¿Cuál es tu objetivo principal?</label>
+                <label className="block text-sm font-semibold mb-2">¿Cuál es tu objetivo?</label>
                 <input 
                   type="text" 
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
-                  placeholder="Ej: Ganar músculo, perder peso, correr mi primera 10k..."
-                  className="w-full bg-zinc-800 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                  placeholder="Ej: Perder 5kg, ganar masa muscular..."
+                  className="w-full bg-zinc-800 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-semibold mb-2">Nivel de Actividad Actual</label>
+                <label className="block text-sm font-semibold mb-2">Nivel Actual</label>
                 <select 
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
-                  className="w-full bg-zinc-800 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all"
+                  className="w-full bg-zinc-800 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white"
                 >
                   <option>Principiante</option>
                   <option>Intermedio</option>
                   <option>Avanzado</option>
-                  <option>Atleta Profesional</option>
+                  <option>Atleta</option>
                 </select>
               </div>
               
@@ -68,12 +68,12 @@ const AIConsultant: React.FC = () => {
                 {loading ? (
                   <>
                     <i className="fas fa-spinner fa-spin"></i>
-                    <span>Diseñando tu plan...</span>
+                    <span>Analizando...</span>
                   </>
                 ) : (
                   <>
-                    <i className="fas fa-brain"></i>
-                    <span>Generar Recomendación AI</span>
+                    <i className="fas fa-bolt"></i>
+                    <span>Obtener Plan Personalizado</span>
                   </>
                 )}
               </button>
@@ -83,24 +83,24 @@ const AIConsultant: React.FC = () => {
           <div className="min-h-[400px] flex items-center justify-center">
             {result ? (
               <div className="space-y-6 animate-fade-in w-full">
-                <div className="relative group overflow-hidden rounded-3xl aspect-video">
-                  <img src={result.image} alt="Visualización de Meta" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+                <div className="relative group overflow-hidden rounded-3xl aspect-video shadow-2xl">
+                  <img src={result.image} alt="Tu Meta" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent"></div>
                 </div>
-                <div className="glass-morphism p-8 rounded-3xl relative overflow-hidden">
+                <div className="glass-morphism p-8 rounded-3xl relative overflow-hidden border border-red-500/30">
                   <h3 className="text-xl font-bold mb-4 flex items-center text-red-400">
-                    <i className="fas fa-lightbulb mr-2"></i> Consejo del Coach
+                    <i className="fas fa-lightbulb mr-2"></i> Consejo de Forza Cangas
                   </h3>
                   <p className="text-zinc-200 text-xl italic leading-relaxed">"{result.advice}"</p>
                 </div>
               </div>
             ) : (
               <div className="text-center p-12 glass-morphism rounded-3xl border-dashed border-2 border-white/10 w-full">
-                <div className="bg-zinc-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="bg-zinc-800 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
                   <i className="fas fa-robot text-3xl text-red-500"></i>
                 </div>
-                <h3 className="text-xl font-bold mb-2">¿Preparado para empezar?</h3>
-                <p className="text-zinc-500">Completa el formulario para ver tu visualización personalizada y consejos de expertos.</p>
+                <h3 className="text-xl font-bold mb-2">Tu futuro empieza aquí</h3>
+                <p className="text-zinc-500">Rellena el formulario para ver tu visualización personalizada.</p>
               </div>
             )}
           </div>

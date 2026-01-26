@@ -9,6 +9,11 @@ const Hero: React.FC = () => {
     generateHeroImage().then(setHeroImg);
   }, []);
 
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
@@ -26,21 +31,27 @@ const Hero: React.FC = () => {
       
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
         <span className="inline-block px-4 py-1 mb-6 text-sm font-semibold tracking-widest text-red-400 uppercase bg-red-400/10 border border-red-400/20 rounded-full">
-          Entrenamiento de Élite en Cangas
+          Entrenamiento de Élite en Cangas do Morrazo
         </span>
         <h1 className="text-5xl md:text-8xl font-black mb-6 leading-tight">
           LIBERA TU <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-400">POTENCIAL</span>
         </h1>
         <p className="text-xl md:text-2xl text-zinc-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Descubre un entorno de entrenamiento exclusivo impulsado por tecnología AI y los mejores coaches de O Morrazo.
+          Un gimnasio exclusivo con tecnología AI y los coaches más motivadores de Galicia.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="#tarifas" className="px-10 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all transform hover:-translate-y-1 shadow-lg shadow-red-500/20">
+          <button 
+            onClick={() => scrollTo('tarifas')}
+            className="px-10 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all transform hover:-translate-y-1 shadow-lg shadow-red-500/20"
+          >
             Ver Planes de Socio
-          </a>
-          <a href="#horarios" className="px-10 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all backdrop-blur-md">
+          </button>
+          <button 
+            onClick={() => scrollTo('horarios')}
+            className="px-10 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all backdrop-blur-md"
+          >
             Explorar Clases
-          </a>
+          </button>
         </div>
       </div>
 

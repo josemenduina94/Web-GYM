@@ -26,22 +26,22 @@ export const TRAINERS: Trainer[] = [
     id: 't1',
     name: 'Marcos Vane',
     specialty: 'Powerlifting y Hipertrofia',
-    bio: 'Ex-atleta olímpico con 15 años de experiencia en acondicionamiento de fuerza extrema.',
-    imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=600&h=800'
+    bio: 'Ex-atleta olímpico con 15 años de experiencia. Su sonrisa es tan grande como su pasión por la fuerza.',
+    imageUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2adfcd?auto=format&fit=crop&q=80&w=800&h=1000'
   },
   {
     id: 't2',
     name: 'Elena Sterling',
     specialty: 'Yoga y Movilidad',
-    bio: 'Especialista en movimientos fluidos que mejoran la flexibilidad y la claridad mental.',
-    imageUrl: 'https://images.unsplash.com/photo-1552196564-972b20136c67?auto=format&fit=crop&q=80&w=600&h=800'
+    bio: 'Maestra de yoga que cree que una actitud positiva es el primer paso para la flexibilidad.',
+    imageUrl: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&q=80&w=800&h=1000'
   },
   {
     id: 't3',
     name: 'Javi Rico',
     specialty: 'HIIT Cross-Funcional',
-    bio: 'Experto en maximizar la quema calórica y el rendimiento atlético en sesiones cortas.',
-    imageUrl: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=600&h=800'
+    bio: 'Energía pura. Javi te motivará con su entusiasmo contagioso en cada sesión de HIIT.',
+    imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800&h=1000'
   }
 ];
 
