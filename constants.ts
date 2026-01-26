@@ -26,22 +26,22 @@ export const TRAINERS: Trainer[] = [
     id: 't1',
     name: 'Marcos Vane',
     specialty: 'Powerlifting y Hipertrofia',
-    bio: 'Ex-atleta olímpico con 15 años de experiencia. Su sonrisa es tan grande como su pasión por la fuerza.',
-    imageUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2adfcd?auto=format&fit=crop&q=80&w=800&h=1000'
+    bio: 'Ex-atleta olímpico. Su enfoque en la técnica y su energía positiva te ayudarán a superar cualquier estancamiento.',
+    imageUrl: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 't2',
     name: 'Elena Sterling',
     specialty: 'Yoga y Movilidad',
-    bio: 'Maestra de yoga que cree que una actitud positiva es el primer paso para la flexibilidad.',
-    imageUrl: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&q=80&w=800&h=1000'
+    bio: 'Maestra de bienestar. Elena combina la calma del yoga con una sonrisa motivadora para mejorar tu salud física y mental.',
+    imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 't3',
     name: 'Javi Rico',
     specialty: 'HIIT Cross-Funcional',
-    bio: 'Energía pura. Javi te motivará con su entusiasmo contagioso en cada sesión de HIIT.',
-    imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800&h=1000'
+    bio: 'Energía pura de Cangas. Javi es conocido por su entusiasmo contagioso y sus entrenamientos de alta intensidad.',
+    imageUrl: 'https://images.unsplash.com/photo-1620188467120-5042ed1eb5da?q=80&w=800&auto=format&fit=crop'
   }
 ];
 
