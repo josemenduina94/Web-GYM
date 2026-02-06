@@ -30,11 +30,6 @@ const Trainers: React.FC = () => {
                 <p className="text-zinc-300 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 leading-relaxed">
                   {trainer.bio}
                 </p>
-                <div className="flex justify-center md:justify-start space-x-6 mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                  <a href="#" className="text-white hover:text-red-500 transition-colors"><i className="fab fa-instagram text-xl"></i></a>
-                  <a href="#" className="text-white hover:text-red-500 transition-colors"><i className="fab fa-twitter text-xl"></i></a>
-                  <a href="#" className="text-white hover:text-red-500 transition-colors"><i className="fab fa-linkedin-in text-xl"></i></a>
-                </div>
               </div>
             </div>
           ))}
