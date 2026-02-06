@@ -28,10 +28,10 @@ const AIConsultant: React.FC = () => {
     <section id="ai-consult" className="py-24 bg-zinc-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
+          <div className="order-1 lg:order-1">
             <h2 className="text-4xl font-black mb-6 uppercase tracking-tighter">Coach de Rendimiento <span className="text-red-500">AI</span></h2>
             <p className="text-zinc-400 mb-8 text-lg">
-              Recibe asesoría profesional inmediata. Cuéntale a nuestra IA tus objetivos en Forza Cangas y diseñaremos tu visualización.
+              Recibe asesoría profesional inmediata. Cuéntale a nuestra IA tus objetivos en Forza Cangas y diseñaremos tu visualización y plan estratégico.
             </p>
             
             <form onSubmit={handleSubmit} className="space-y-6 glass-morphism p-10 rounded-[2.5rem] border border-red-500/20 shadow-2xl">
@@ -69,7 +69,7 @@ const AIConsultant: React.FC = () => {
                 {loading ? (
                   <>
                     <i className="fas fa-spinner fa-spin"></i>
-                    <span>Analizando Meta...</span>
+                    <span>Generando Estrategia...</span>
                   </>
                 ) : (
                   <>
@@ -81,7 +81,7 @@ const AIConsultant: React.FC = () => {
             </form>
           </div>
           
-          <div className="min-h-[450px] flex items-center justify-center">
+          <div className="min-h-[450px] flex items-center justify-center order-2 lg:order-2">
             {result ? (
               <div className="space-y-6 animate-fade-in w-full">
                 <div className="relative group overflow-hidden rounded-[2.5rem] aspect-video shadow-2xl border border-white/10">
@@ -93,9 +93,11 @@ const AIConsultant: React.FC = () => {
                 </div>
                 <div className="glass-morphism p-8 rounded-[2rem] relative overflow-hidden border border-red-500/30">
                   <h3 className="text-sm font-black mb-4 flex items-center text-red-500 uppercase tracking-widest">
-                    <i className="fas fa-brain mr-3"></i> Análisis de rendimiento
+                    <i className="fas fa-brain mr-3"></i> Plan Maestro de Rendimiento
                   </h3>
-                  <p className="text-zinc-200 text-xl font-medium leading-relaxed italic">"{result.advice}"</p>
+                  <div className="text-zinc-200 text-lg font-medium leading-relaxed whitespace-pre-line">
+                    {result.advice}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -105,7 +107,7 @@ const AIConsultant: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-black mb-3 uppercase tracking-tight">Tu transformación inicia aquí</h3>
                 <p className="text-zinc-500 max-w-xs mx-auto text-sm leading-relaxed">
-                  Utiliza el formulario de arriba para generar una visualización realista de tus objetivos y recibir consejos personalizados.
+                  Utiliza el formulario de la izquierda para generar una visualización realista de tus objetivos y recibir consejos personalizados.
                 </p>
               </div>
             )}

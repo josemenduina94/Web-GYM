@@ -1,25 +1,37 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export async function generateFitnessAdvice(goal: string, activityLevel: string) {
-  const prompt = `Actúa como un entrenador personal de élite en España. Proporciona un consejo de entrenamiento corto y motivador de máximo 3 frases para alguien cuyo objetivo es "${goal}" y su nivel de actividad actual es "${activityLevel}". Responde siempre en español y sé muy profesional.`;
+  const prompt = `Actúa como un Head Coach de alto rendimiento de Forza Cangas, experto en fisiología del ejercicio y psicología deportiva. 
+  Un atleta con un nivel de condición física "${activityLevel}" quiere lograr lo siguiente: "${goal}".
+  
+  Tu tarea es proporcionar una respuesta desarrollada y estructurada que incluya:
+  1. Un análisis técnico de por qué ese objetivo es alcanzable para su nivel.
+  2. Un enfoque estratégico de entrenamiento (frecuencia, tipo de ejercicios clave).
+  3. Un pilar nutricional o de recuperación esencial para este objetivo específico.
+  4. Un cierre con un "Grito de Guerra" o frase motivadora gallega/fuerte.
+  
+  La respuesta debe ser profesional, inspiradora y extensa (mínimo 150 palabras). Usa un tono que demuestre autoridad pero cercanía. Responde siempre en español. No uses negritas excesivas, usa un formato limpio con saltos de línea para que sea fácil de leer.`;
   
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3-pro-preview', // Cambiado a Pro para respuestas más complejas y de mayor calidad
       contents: prompt,
+      config: {
+        thinkingConfig: { thinkingBudget: 4000 } // Añadido presupuesto de pensamiento para mayor profundidad
+      }
     });
-    return response.text || "¡Sigue superando tus límites cada día en Cangas!";
+    return response.text || "¡Tu camino hacia la excelencia comienza con el primer paso! En Forza Cangas te daremos las herramientas para que logres tu mejor versión.";
   } catch (error) {
     console.error("Error generating advice:", error);
-    return "El mejor entrenamiento es el que se hace. ¡Vamos a movernos!";
+    return "Como entrenador, te digo que la constancia supera al talento. Tu objetivo es ambicioso pero perfectamente alcanzable con el plan adecuado. ¡Vente al box y trazaremos la ruta hacia el éxito juntos!";
   }
 }
 
 export async function generateGoalVisual(goal: string) {
-  const prompt = `A high-quality, cinematic, motivational fitness photography of a modern luxury gym setting in a coastal town like Cangas do Morrazo, representing the goal of "${goal}". Professional lighting, dynamic composition, 4k resolution.`;
+  const prompt = `A cinematic, ultra-realistic motivational fitness photography of an athlete achieving the goal of "${goal}" in a state-of-the-art gym. Intense lighting, sweat, grit, professional sports photography style, 8k resolution, depth of field.`;
   
   try {
     const response = await ai.models.generateContent({
