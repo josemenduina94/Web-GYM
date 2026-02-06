@@ -105,7 +105,7 @@ const AIConsultant: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-black mb-3 uppercase tracking-tight">Tu transformación inicia aquí</h3>
                 <p className="text-zinc-500 max-w-xs mx-auto text-sm leading-relaxed">
-                  Utiliza el formulario de la izquierda para generar una visualización realista de tus objetivos y recibir consejos personalizados.
+                  Utiliza el formulario de arriba para generar una visualización realista de tus objetivos y recibir consejos personalizados.
                 </p>
               </div>
             )}

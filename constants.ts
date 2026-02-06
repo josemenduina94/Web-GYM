@@ -1,4 +1,3 @@
-
 import { ClassItem, Trainer, PricingPlan } from './types';
 
 export const CLASSES: ClassItem[] = [
@@ -27,7 +26,7 @@ export const TRAINERS: Trainer[] = [
     name: 'Marcos Vane',
     specialty: 'Powerlifting y Hipertrofia',
     bio: 'Ex-atleta olímpico. Especialista en técnica de peso muerto y fuerza bruta con control absoluto.',
-    imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&auto=format&fit=crop'
+    imageUrl: 'https://images.unsplash.com/photo-1617911580830-48263c541844?auto=format&fit=crop&q=80&w=800'
   },
   {
     id: 't2',
@@ -41,7 +40,7 @@ export const TRAINERS: Trainer[] = [
     name: 'Javi Rico',
     specialty: 'HIIT Cross-Funcional',
     bio: 'Energía pura de Cangas. Especialista en WODs explosivos y acondicionamiento metabólico extremo.',
-    imageUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800&auto=format&fit=crop'
+    imageUrl: 'https://images.unsplash.com/photo-1507398941214-57f196f4ab3c?q=80&w=800&auto=format&fit=crop'
   }
 ];
 
