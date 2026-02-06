@@ -26,7 +26,7 @@ export const TRAINERS: Trainer[] = [
     name: 'Marcos Vane',
     specialty: 'Powerlifting y Hipertrofia',
     bio: 'Ex-atleta olímpico. Especialista en técnica de peso muerto y fuerza bruta con control absoluto.',
-    imageUrl: 'https://images.unsplash.com/photo-1617911580830-48263c541844?auto=format&fit=crop&q=80&w=800'
+    imageUrl: 'https://images.unsplash.com/photo-1633706961726-c67a0b691734?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fEluc3RydWN0b3IlMjBkZSUyMGZpdG5lc3N8ZW58MHx8MHx8fDA%3D'
   },
   {
     id: 't2',
