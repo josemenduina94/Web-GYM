@@ -1,45 +1,90 @@
+
 import { GoogleGenAI } from "@google/genai";
 
-// Configuración profesional para Vercel
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export async function generateFitnessAdvice(goal: string, activityLevel: string) {
-  const prompt = `Actúa como el Head Coach de Forza Cangas, un experto con 20 años de experiencia en entrenamiento de élite, biomecánica y nutrición deportiva avanzada.
-  Un cliente con un nivel de condición física "${activityLevel}" se ha marcado el siguiente objetivo: "${goal}".
+  const prompt = `Actúa como el Director Técnico de Forza Cangas. Eres un experto en fisiología y psicología deportiva. 
+  
+  CONTEXTO DEL ATLETA:
+  - Nivel actual: ${activityLevel}
+  - Objetivo declarado: ${goal}
 
-  Tu misión es proporcionarle una respuesta EXTREMADAMENTE DETALLADA y PROFESIONAL. No te limites a consejos genéricos. Tu respuesta debe incluir:
+  INSTRUCCIONES DE RESPUESTA AUTOMÁTICA SEGÚN NIVEL:
+  - Si es PRINCIPIANTE: Enfócate en la base técnica, la adherencia y la seguridad. Usa un tono motivador y protector.
+  - Si es INTERMEDIO: Habla de sobrecarga progresiva, variaciones de ejercicios y nutrición para el rendimiento.
+  - Si es AVANZADO/ÉLITE: Sé extremadamente técnico. Habla de microciclos, RPE/RIR, optimización de sustratos energéticos y detalles biomecánicos finos.
 
-  1. ANÁLISIS BIOMECÁNICO Y FISIOLÓGICO: Explica qué procesos ocurrirán en su cuerpo al perseguir este objetivo considerando su nivel actual. Sé técnico pero comprensible.
-  2. PROGRAMACIÓN ESTRATÉGICA: Define una estructura de microciclo. ¿Qué días debería priorizar fuerza? ¿Cuándo el trabajo metabólico? Menciona ejercicios específicos clave que no pueden faltar en Forza Cangas.
-  3. PROTOCOLO DE RECUPERACIÓN Y NUTRICIÓN: No solo qué comer, sino cuándo y por qué. Habla de la importancia del sueño y suplementación básica si aplica.
-  4. MINDSET Y PSICOLOGÍA: Cómo superar el muro mental que vendrá a las primeras semanas.
-  5. CIERRE MOTIVACIONAL: Un mensaje potente con fuerza gallega, recordándole que en Cangas no solo entrenamos, forjamos versiones imparables.
+  ESTRUCTURA OBLIGATORIA DEL MENSAJE (Extenso y detallado):
+  1. ANALISIS DEL RETO: Evalúa la viabilidad de "${goal}" para un nivel "${activityLevel}".
+  2. BLUEPRINT DE ENTRENAMIENTO: Diseña una semana tipo (frecuencia, intensidad, ejercicios específicos de Forza Cangas).
+  3. NUTRICIÓN DE PRECISIÓN: Macros recomendados y timing de nutrientes para este objetivo.
+  4. FACTOR MENTAL: Un consejo psicológico para no abandonar.
+  5. EL SELLO FORZA: Termina con un cierre potente y auténtico de Cangas.
 
   REGLAS DE FORMATO:
-  - Extensión: Al menos 300-400 palabras.
-  - Tono: Épico, profesional, técnico y motivador.
-  - Idioma: Español.
-  - Usa saltos de línea claros entre secciones.
-  - Evita el uso excesivo de negritas.`;
+  - Mínimo 350 palabras.
+  - Usa un lenguaje profesional pero con "chispa" y energía.
+  - Responde en Español.
+  - Usa saltos de línea dobles para separar secciones claramente.`;
 
   try {
-    // Usamos el modelo 1.5-flash que es el más estable para entornos web
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: prompt,
+      config: {
+        thinkingConfig: { thinkingBudget: 10000 },
+        temperature: 0.8
+      }
+    });
+    return response.text || "Tu plan está listo en nuestra base de datos. ¡Vamos a por ello!";
   } catch (error) {
-    console.error("Error en el Coach:", error);
-    return "En Forza Cangas forjamos versiones imparables. El sistema está ajustando tu plan de élite, ¡hablemos en el box para empezar hoy mismo!";
+    console.error("Error generating advice:", error);
+    return "La tecnología está procesando tu potencia. Mientras tanto, recuerda: la disciplina es el puente entre tus metas y tus logros. ¡Nos vemos en el box!";
   }
 }
 
 export async function generateGoalVisual(goal: string) {
-  // Nota: El modelo Flash no genera imágenes directamente, 
-  // así que devolvemos una foto de alta calidad de stock relacionada con el gimnasio
-  return 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200';
+  const prompt = `High-end commercial fitness photography of an athlete achieving ${goal}. Hyper-realistic, dramatic rim lighting, particles of chalk and sweat in the air, deep shadows, cinematic teal and orange color grading, 8k, bokeh background showing a premium gym atmosphere.`;
+  
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [{ text: prompt }],
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: "16:9"
+        }
+      }
+    });
+
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
+    }
+    return 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200';
+  } catch (error) {
+    console.error("Error generating image:", error);
+    return 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=1200';
+  }
 }
 
 export async function generateHeroImage() {
-  return 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=1920';
+    const prompt = "Cinematic wide shot of a modern luxury fitness studio in Galicia, Spain, with sea views from the windows, high-end wooden and metal equipment, warm and neon lighting mix, morning light. 4k resolution.";
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: { parts: [{ text: prompt }] },
+            config: { imageConfig: { aspectRatio: "16:9" } }
+        });
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
+        }
+    } catch (e) {
+        return 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=1920';
+    }
+    return 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=1920';
 }
