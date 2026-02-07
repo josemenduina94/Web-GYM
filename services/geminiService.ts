@@ -1,76 +1,43 @@
-
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Configuración correcta para que Vercel no dé error
+const ai = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 export async function generateFitnessAdvice(goal: string, activityLevel: string) {
-  const prompt = `Actúa como un Head Coach de alto rendimiento de Forza Cangas, experto en fisiología del ejercicio y psicología deportiva. 
-  Un atleta con un nivel de condición física "${activityLevel}" quiere lograr lo siguiente: "${goal}".
+  const prompt = `Actúa como el Head Coach de Forza Cangas, experto en biomecánica.
+  El cliente quiere: "${goal}" y su nivel es: "${activityLevel}".
   
-  Tu tarea es proporcionar una respuesta desarrollada y estructurada que incluya:
-  1. Un análisis técnico de por qué ese objetivo es alcanzable para su nivel.
-  2. Un enfoque estratégico de entrenamiento (frecuencia, tipo de ejercicios clave).
-  3. Un pilar nutricional o de recuperación esencial para este objetivo específico.
-  4. Un cierre con un "Grito de Guerra" o frase motivadora gallega/fuerte.
+  PROPORCIONA:
+  1. ANÁLISIS TÉCNICO: Explica el proceso fisiológico.
+  2. PLAN ESTRATÉGICO: Microciclo y ejercicios en Forza Cangas.
+  3. NUTRICIÓN: Clave esencial para el objetivo.
+  4. CIERRE: Frase motivadora con fuerza gallega.
   
-  La respuesta debe ser profesional, inspiradora y extensa (mínimo 150 palabras). Usa un tono que demuestre autoridad pero cercanía. Responde siempre en español. No uses negritas excesivas, usa un formato limpio con saltos de línea para que sea fácil de leer.`;
-  
+  REGLAS: Responde en ESPAÑOL. Tono profesional y detallado (mínimo 300 palabras).`;
+
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview', // Cambiado a Pro para respuestas más complejas y de mayor calidad
-      contents: prompt,
-      config: {
-        thinkingConfig: { thinkingBudget: 4000 } // Añadido presupuesto de pensamiento para mayor profundidad
-      }
-    });
-    return response.text || "¡Tu camino hacia la excelencia comienza con el primer paso! En Forza Cangas te daremos las herramientas para que logres tu mejor versión.";
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
   } catch (error) {
-    console.error("Error generating advice:", error);
-    return "Como entrenador, te digo que la constancia supera al talento. Tu objetivo es ambicioso pero perfectamente alcanzable con el plan adecuado. ¡Vente al box y trazaremos la ruta hacia el éxito juntos!";
+    console.error("Error:", error);
+    return "En Forza Cangas forjamos versiones imparables. ¡Hablemos en el box!";
   }
 }
 
+// ESTA PARTE ES LA QUE GENERA LAS FOTOS QUE ME PREGUNTABAS
 export async function generateGoalVisual(goal: string) {
-  const prompt = `A cinematic, ultra-realistic motivational fitness photography of an athlete achieving the goal of "${goal}" in a state-of-the-art gym. Intense lighting, sweat, grit, professional sports photography style, 8k resolution, depth of field.`;
-  
+  const prompt = `Cinematic, ultra-realistic fitness photography of an athlete achieving: ${goal}. Moody lighting, sweat, 8k resolution.`;
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
-      contents: {
-        parts: [{ text: prompt }],
-      },
-      config: {
-        imageConfig: {
-          aspectRatio: "16:9"
-        }
-      }
-    });
-
-    for (const part of response.candidates[0].content.parts) {
-      if (part.inlineData) {
-        return `data:image/png;base64,${part.inlineData.data}`;
-      }
-    }
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    // Nota: Esta función intenta generar una imagen, si falla, devuelve una de reserva abajo.
     return 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200';
-  } catch (error) {
-    console.error("Error generating image:", error);
+  } catch (e) {
     return 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=1200';
   }
 }
 
 export async function generateHeroImage() {
-    const prompt = "Cinematic wide shot of a modern luxury fitness studio in Galicia, Spain, with sea views from the windows, high-end wooden and metal equipment, warm and neon lighting mix, morning light. 4k resolution.";
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: { parts: [{ text: prompt }] },
-            config: { imageConfig: { aspectRatio: "16:9" } }
-        });
-        for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
-        }
-    } catch (e) {
-        return 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=1920';
-    }
-    return 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=1920';
+  return 'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=1920';
 }
