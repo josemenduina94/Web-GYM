@@ -1,38 +1,33 @@
 import { GoogleGenAI } from "@google/genai";
 
+// 1. Ponemos la llave directamente. No toques ni una letra de esta línea.
+const API_KEY = "AIzaSyAPYUfRNmwWDJBxHt3Fg_oQqzlr49dwhQ";
+
 export async function generateFitnessAdvice(goal: string, activityLevel: string) {
   try {
-    // 1. Obtener la llave y configurar el cliente
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) throw new Error("API Key no encontrada en Vercel");
-
-    const genAI = new GoogleGenAI(apiKey);
-    
-    // 2. Usar el modelo 1.5-flash
+    // 2. Inicializamos el motor con la llave directa
+    const genAI = new GoogleGenAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = `Actúa como el Head Coach de Forza Cangas. 
-    Cliente nivel: ${activityLevel}. Objetivo: ${goal}.
-    
-    PROPORCIONA UNA RESPUESTA DE 400 PALABRAS:
+    const prompt = `Actúa como el Head Coach de Forza Cangas, experto con 20 años de experiencia.
+    Un cliente con nivel "${activityLevel}" quiere lograr: "${goal}".
+
+    Tu misión es darle una respuesta de 400 PALABRAS detallando:
     1. ANÁLISIS BIOMECÁNICO.
-    2. PROGRAMACIÓN EN FORZA CANGAS.
+    2. PROGRAMACIÓN EN EL BOX.
     3. NUTRICIÓN Y RECUPERACIÓN.
     4. MINDSET.
-    5. CIERRE CON FUERZA GALLEGA.
+    5. CIERRE MOTIVACIONAL GALLEGO.
 
-    Responde en ESPAÑOL, con tono épico y profesional.`;
+    Usa un tono épico, técnico y profesional en ESPAÑOL.`;
 
-    // 3. Ejecutar la petición
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
-
-    return text;
+    return response.text();
 
   } catch (error: any) {
     console.error("Error crítico:", error);
-    return `Lo sentimos, el Coach está atendiendo a un atleta. (Error: ${error.message}). ¡Reintenta ahora!`;
+    return "¡En Forza Cangas no nos rendimos! El sistema está ajustando tu plan, intenta pulsar el botón de nuevo o refresca la página.";
   }
 }
 
