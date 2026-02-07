@@ -1,29 +1,23 @@
 import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
 
-// 1. Inicialización corregida (usamos 'genAI' para que coincida con el código de abajo)
+// 1. Inicialización ultra-segura
 const genAI = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 export async function generateFitnessAdvice(goal: string, activityLevel: string) {
-  const prompt = `Actúa como el Head Coach de Forza Cangas, un experto con 20 años de experiencia en entrenamiento de élite, biomecánica y nutrición deportiva avanzada.
-  Un cliente con un nivel de condición física "${activityLevel}" se ha marcado el siguiente objetivo: "${goal}".
+  // 2. Simplificamos el prompt un poco para descartar que sea por exceso de texto
+  const prompt = `Actúa como el Head Coach de Forza Cangas. 
+  Cliente nivel: ${activityLevel}. Objetivo: ${goal}.
+  
+  PROPORCIONA UNA RESPUESTA DE 400 PALABRAS:
+  1. ANÁLISIS BIOMECÁNICO.
+  2. PROGRAMACIÓN EN FORZA CANGAS.
+  3. NUTRICIÓN Y RECUPERACIÓN.
+  4. MINDSET.
+  5. CIERRE CON FUERZA GALLEGA.
 
-  Tu misión es proporcionarle una respuesta EXTREMADAMENTE DETALLADA y PROFESIONAL. No te limites a consejos genéricos. Tu respuesta debe incluir:
-
-  1. ANÁLISIS BIOMECÁNICO Y FISIOLÓGICO: Explica qué procesos ocurrirán en su cuerpo al perseguir este objetivo considerando su nivel actual. Sé técnico pero comprensible.
-  2. PROGRAMACIÓN ESTRATÉGICA: Define una estructura de microciclo. ¿Qué días debería priorizar fuerza? ¿Cuándo el trabajo metabólico? Menciona ejercicios específicos clave que no pueden faltar en Forza Cangas.
-  3. PROTOCOLO DE RECUPERACIÓN Y NUTRICIÓN: No solo qué comer, sino cuándo y por qué. Habla de la importancia del sueño y suplementación básica si aplica.
-  4. MINDSET Y PSICOLOGÍA: Cómo superar el muro mental que vendrá a las primeras semanas.
-  5. CIERRE MOTIVACIONAL: Un mensaje potente con fuerza gallega, recordándole que en Cangas no solo entrenamos, forjamos versiones imparables.
-
-  REGLAS DE FORMATO:
-  - Extensión: Al menos 300-400 palabras.
-  - Tono: Épico, profesional, técnico y motivador.
-  - Idioma: Español.
-  - Usa saltos de línea claros entre secciones.
-  - Evita el uso excesivo de negritas.`;
+  Responde en ESPAÑOL, con tono épico y profesional.`;
 
   try {
-    // 2. Usamos el mismo nombre 'genAI' y añadimos configuración de seguridad
     const model = genAI.getGenerativeModel({ 
       model: "gemini-1.5-flash",
       safetySettings: [
@@ -35,15 +29,21 @@ export async function generateFitnessAdvice(goal: string, activityLevel: string)
     });
 
     const result = await model.generateContent(prompt);
+    
+    // 3. Verificación de seguridad
+    if (!result || !result.response) {
+      throw new Error("No hay respuesta del modelo");
+    }
+
     const response = await result.response;
-    const text = response.text();
+    return response.text();
 
-    if (!text) throw new Error("No se generó texto");
-    return text;
-
-  } catch (error) {
-    console.error("Error en el Coach:", error);
-    return "En Forza Cangas forjamos versiones imparables. El sistema está ajustando tu plan de élite, ¡reintenta o hablemos en el box para empezar hoy mismo!";
+  } catch (error: any) {
+    // Esto imprimirá el error real en la consola de tu navegador (F12)
+    console.error("ERROR DETALLADO:", error);
+    
+    // Si el error dice "API_KEY_INVALID", es que la llave está mal copiada
+    return `Error técnico: ${error.message || 'Consulta la consola'}. En Forza Cangas no nos rendimos, ¡reintenta!`;
   }
 }
 
