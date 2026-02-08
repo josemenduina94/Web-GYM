@@ -1,18 +1,50 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateFitnessAdvice, generateGoalVisual } from '../services/geminiService';
+
+// Define the interface for AIStudio to ensure it matches the expected global type
+interface AIStudio {
+  hasSelectedApiKey: () => Promise<boolean>;
+  openSelectKey: () => Promise<void>;
+}
+
+declare global {
+  interface Window {
+    // Correctly augment Window to use the existing AIStudio type name
+    aistudio: AIStudio;
+  }
+}
 
 const AIConsultant: React.FC = () => {
   const [goal, setGoal] = useState('');
   const [level, setLevel] = useState('Intermedio');
   const [loading, setLoading] = useState(false);
+  const [hasKey, setHasKey] = useState(true);
   const [result, setResult] = useState<{ advice: string; image: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkKey = async () => {
+      if (window.aistudio) {
+        const selected = await window.aistudio.hasSelectedApiKey();
+        setHasKey(selected);
+      }
+    };
+    checkKey();
+  }, []);
+
+  const handleOpenKey = async () => {
+    if (window.aistudio) {
+      await window.aistudio.openSelectKey();
+      // MUST assume the key selection was successful after triggering openSelectKey() as per guidelines
+      setHasKey(true);
+    }
+  };
 
   const quickGoals = [
     "Perder 10kg de grasa",
     "Aumentar masa muscular",
     "Peso Muerto 200kg",
-    "Correr mi primera 10k",
     "Mejorar flexibilidad"
   ];
 
@@ -22,15 +54,21 @@ const AIConsultant: React.FC = () => {
     if (!targetGoal) return;
     
     setLoading(true);
+    setError(null);
     try {
-      // Usamos Promise.all para ejecutar ambas llamadas en paralelo y ahorrar tiempo
       const [advice, image] = await Promise.all([
         generateFitnessAdvice(targetGoal, level),
         generateGoalVisual(targetGoal)
       ]);
       setResult({ advice, image });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error al generar plan:", err);
+      // Reset key selection state and prompt user if "Requested entity was not found" occurs
+      if (err.message?.includes("Requested entity was not found") || err.message?.includes("API Key") || !process.env.API_KEY) {
+        setHasKey(false);
+      } else {
+        setError("Hubo un problema conectando con el Coach. Por favor, reinténtalo.");
+      }
     } finally {
       setLoading(false);
     }
@@ -40,95 +78,123 @@ const AIConsultant: React.FC = () => {
     <section id="ai-consult" className="py-24 bg-zinc-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Formulario a la IZQUIERDA */}
           <div className="lg:sticky lg:top-24">
             <h2 className="text-4xl font-black mb-6 uppercase tracking-tighter">Coach de Rendimiento <span className="text-red-500">AI</span></h2>
             <p className="text-zinc-400 mb-8 text-lg leading-relaxed">
-              Nuestro motor de inteligencia deportiva genera planes precisos basados en tu nivel real. Obtén consejos profesionales en segundos.
+              Nuestro motor de inteligencia deportiva genera planes precisos basados en tu nivel real. Obtén consejos profesionales de Forza Cangas en segundos.
             </p>
             
-            <form onSubmit={handleSubmit} className="space-y-6 glass-morphism p-8 rounded-[2.5rem] border border-red-500/20 shadow-2xl mb-8">
-              <div className="space-y-2">
-                <label className="block text-xs font-black uppercase text-zinc-500 tracking-widest ml-1">¿Cuál es tu objetivo?</label>
-                <input 
-                  required
-                  type="text" 
-                  value={goal}
-                  onChange={(e) => setGoal(e.target.value)}
-                  placeholder="Ej: Preparar una maratón, hipertrofia..."
-                  className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white font-medium"
-                />
-              </div>
-              
-              <div className="flex flex-wrap gap-2 mb-4">
-                {quickGoals.map((q) => (
-                  <button
-                    key={q}
-                    type="button"
-                    onClick={() => { setGoal(q); }}
-                    className="text-[10px] uppercase font-bold px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-red-500/50 transition-colors text-zinc-400 hover:text-white"
+            {!hasKey ? (
+              <div className="glass-morphism p-8 rounded-[2.5rem] border border-yellow-500/30 text-center">
+                <i className="fas fa-key text-yellow-500 text-3xl mb-4"></i>
+                <h3 className="text-xl font-bold mb-2">IA en Reposo</h3>
+                <p className="text-zinc-400 mb-4 text-sm">Para activar el Plan Maestro, necesitas seleccionar una clave de API de un proyecto con facturación activa.</p>
+                <div className="mb-6">
+                  <a 
+                    href="https://ai.google.dev/gemini-api/docs/billing" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-red-500 hover:text-red-400 text-xs underline font-bold"
                   >
-                    {q}
-                  </button>
-                ))}
-              </div>
-              
-              <div className="space-y-2">
-                <label className="block text-xs font-black uppercase text-zinc-500 tracking-widest ml-1">Nivel de Condición Física</label>
-                <select 
-                  value={level}
-                  onChange={(e) => setLevel(e.target.value)}
-                  className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white font-medium appearance-none"
+                    Documentación sobre facturación de la API
+                  </a>
+                </div>
+                <button 
+                  onClick={handleOpenKey}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-xl font-bold transition-all w-full"
                 >
-                  <option>Principiante</option>
-                  <option>Intermedio</option>
-                  <option>Avanzado</option>
-                  <option>Atleta de Élite</option>
-                </select>
+                  Activar IA Coach
+                </button>
               </div>
-              
-              <button 
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 py-5 rounded-2xl font-black text-lg uppercase tracking-tighter transition-all flex items-center justify-center space-x-3 disabled:opacity-50 shadow-xl shadow-red-600/20"
-              >
-                {loading ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin"></i>
-                    <span>Analizando Variables...</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-bolt"></i>
-                    <span>Generar Plan Maestro</span>
-                  </>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6 glass-morphism p-8 rounded-[2.5rem] border border-red-500/20 shadow-2xl mb-8">
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl text-red-500 text-sm font-medium mb-4">
+                    {error}
+                  </div>
                 )}
-              </button>
-            </form>
+                
+                <div className="space-y-2">
+                  <label className="block text-xs font-black uppercase text-zinc-500 tracking-widest ml-1">¿Cuál es tu objetivo?</label>
+                  <input 
+                    required
+                    type="text" 
+                    value={goal}
+                    onChange={(e) => setGoal(e.target.value)}
+                    placeholder="Ej: Aumentar masa muscular..."
+                    className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white font-medium"
+                  />
+                </div>
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {quickGoals.map((q) => (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => { setGoal(q); }}
+                      className="text-[10px] uppercase font-bold px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-red-500/50 transition-colors text-zinc-400 hover:text-white"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="block text-xs font-black uppercase text-zinc-500 tracking-widest ml-1">Nivel de Condición Física</label>
+                  <select 
+                    value={level}
+                    onChange={(e) => setLevel(e.target.value)}
+                    className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white font-medium appearance-none"
+                  >
+                    <option>Principiante</option>
+                    <option>Intermedio</option>
+                    <option>Avanzado</option>
+                    <option>Atleta de Élite</option>
+                  </select>
+                </div>
+                
+                <button 
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 py-5 rounded-2xl font-black text-lg uppercase tracking-tighter transition-all flex items-center justify-center space-x-3 disabled:opacity-50 shadow-xl shadow-red-600/20"
+                >
+                  {loading ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Sincronizando con el Box...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-bolt"></i>
+                      <span>Generar Plan Maestro</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
           
-          {/* Visualización a la DERECHA */}
           <div className="min-h-[500px] flex items-start justify-center">
             {result ? (
               <div className="space-y-6 animate-fade-in w-full">
                 <div className="relative group overflow-hidden rounded-[2.5rem] aspect-video shadow-2xl border border-white/10">
-                  <img src={result.image} alt="Tu Meta Visualizada" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000" />
+                  <img src={result.image} alt="Meta Forza" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000" />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent"></div>
                   <div className="absolute bottom-6 left-8">
-                    <span className="bg-red-600 text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-widest">Previsualización AI</span>
+                    <span className="bg-red-600 text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-widest">Visualización Forza</span>
                   </div>
                 </div>
                 
-                <div className="glass-morphism p-10 rounded-[2.5rem] relative overflow-hidden border border-red-500/30">
+                <div className="glass-morphism p-10 rounded-[2.5rem] border border-red-500/30">
                   <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
                     <div>
                       <h3 className="text-xl font-black uppercase tracking-widest text-red-500">FORZA MASTER PLAN</h3>
-                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Estrategia para nivel {level}</p>
+                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Nivel {level}</p>
                     </div>
                     <i className="fas fa-brain text-red-500 text-2xl"></i>
                   </div>
                   
-                  <div className="text-zinc-200 text-base md:text-lg font-medium leading-relaxed whitespace-pre-line custom-scrollbar">
+                  <div className="text-zinc-200 text-base md:text-lg font-medium leading-relaxed whitespace-pre-line">
                     {result.advice}
                   </div>
                 </div>
@@ -138,9 +204,9 @@ const AIConsultant: React.FC = () => {
                 <div className="bg-zinc-800 w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner transform group-hover:scale-110 transition-transform border border-white/5">
                   <i className="fas fa-robot text-5xl text-red-500"></i>
                 </div>
-                <h3 className="text-3xl font-black mb-4 uppercase tracking-tight">Tu transformación inicia aquí</h3>
+                <h3 className="text-3xl font-black mb-4 uppercase tracking-tight">Tu cambio empieza hoy</h3>
                 <p className="text-zinc-500 max-w-sm mx-auto text-lg leading-relaxed">
-                  Utiliza el formulario de la izquierda para generar una visualización realista de tus objetivos y recibir consejos personalizados detallados.
+                  Genera una estrategia profesional basada en la metodología de Forza Cangas.
                 </p>
               </div>
             )}
