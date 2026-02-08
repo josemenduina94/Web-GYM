@@ -1,45 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { generateFitnessAdvice, generateGoalVisual } from '../services/geminiService';
-
-// Define the interface for AIStudio to ensure it matches the expected global type
-interface AIStudio {
-  hasSelectedApiKey: () => Promise<boolean>;
-  openSelectKey: () => Promise<void>;
-}
-
-declare global {
-  interface Window {
-    // Correctly augment Window to use the existing AIStudio type name
-    aistudio: AIStudio;
-  }
-}
 
 const AIConsultant: React.FC = () => {
   const [goal, setGoal] = useState('');
   const [level, setLevel] = useState('Intermedio');
   const [loading, setLoading] = useState(false);
-  const [hasKey, setHasKey] = useState(true);
   const [result, setResult] = useState<{ advice: string; image: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const checkKey = async () => {
-      if (window.aistudio) {
-        const selected = await window.aistudio.hasSelectedApiKey();
-        setHasKey(selected);
-      }
-    };
-    checkKey();
-  }, []);
-
-  const handleOpenKey = async () => {
-    if (window.aistudio) {
-      await window.aistudio.openSelectKey();
-      // MUST assume the key selection was successful after triggering openSelectKey() as per guidelines
-      setHasKey(true);
-    }
-  };
 
   const quickGoals = [
     "Perder 10kg de grasa",
@@ -63,12 +31,7 @@ const AIConsultant: React.FC = () => {
       setResult({ advice, image });
     } catch (err: any) {
       console.error("Error al generar plan:", err);
-      // Reset key selection state and prompt user if "Requested entity was not found" occurs
-      if (err.message?.includes("Requested entity was not found") || err.message?.includes("API Key") || !process.env.API_KEY) {
-        setHasKey(false);
-      } else {
-        setError("Hubo un problema conectando con el Coach. Por favor, reinténtalo.");
-      }
+      setError("El Coach está analizando otros atletas. Por favor, reintenta en unos segundos.");
     } finally {
       setLoading(false);
     }
@@ -84,94 +47,70 @@ const AIConsultant: React.FC = () => {
               Nuestro motor de inteligencia deportiva genera planes precisos basados en tu nivel real. Obtén consejos profesionales de Forza Cangas en segundos.
             </p>
             
-            {!hasKey ? (
-              <div className="glass-morphism p-8 rounded-[2.5rem] border border-yellow-500/30 text-center">
-                <i className="fas fa-key text-yellow-500 text-3xl mb-4"></i>
-                <h3 className="text-xl font-bold mb-2">IA en Reposo</h3>
-                <p className="text-zinc-400 mb-4 text-sm">Para activar el Plan Maestro, necesitas seleccionar una clave de API de un proyecto con facturación activa.</p>
-                <div className="mb-6">
-                  <a 
-                    href="https://ai.google.dev/gemini-api/docs/billing" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-red-500 hover:text-red-400 text-xs underline font-bold"
-                  >
-                    Documentación sobre facturación de la API
-                  </a>
+            <form onSubmit={handleSubmit} className="space-y-6 glass-morphism p-8 rounded-[2.5rem] border border-red-500/20 shadow-2xl mb-8">
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl text-red-500 text-sm font-medium mb-4">
+                  {error}
                 </div>
-                <button 
-                  onClick={handleOpenKey}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-xl font-bold transition-all w-full"
-                >
-                  Activar IA Coach
-                </button>
+              )}
+              
+              <div className="space-y-2">
+                <label className="block text-xs font-black uppercase text-zinc-500 tracking-widest ml-1">¿Cuál es tu objetivo?</label>
+                <input 
+                  required
+                  type="text" 
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)}
+                  placeholder="Ej: Aumentar masa muscular..."
+                  className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white font-medium"
+                />
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6 glass-morphism p-8 rounded-[2.5rem] border border-red-500/20 shadow-2xl mb-8">
-                {error && (
-                  <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl text-red-500 text-sm font-medium mb-4">
-                    {error}
-                  </div>
-                )}
-                
-                <div className="space-y-2">
-                  <label className="block text-xs font-black uppercase text-zinc-500 tracking-widest ml-1">¿Cuál es tu objetivo?</label>
-                  <input 
-                    required
-                    type="text" 
-                    value={goal}
-                    onChange={(e) => setGoal(e.target.value)}
-                    placeholder="Ej: Aumentar masa muscular..."
-                    className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white font-medium"
-                  />
-                </div>
-                
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {quickGoals.map((q) => (
-                    <button
-                      key={q}
-                      type="button"
-                      onClick={() => { setGoal(q); }}
-                      className="text-[10px] uppercase font-bold px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-red-500/50 transition-colors text-zinc-400 hover:text-white"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="block text-xs font-black uppercase text-zinc-500 tracking-widest ml-1">Nivel de Condición Física</label>
-                  <select 
-                    value={level}
-                    onChange={(e) => setLevel(e.target.value)}
-                    className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white font-medium appearance-none"
+              
+              <div className="flex flex-wrap gap-2 mb-4">
+                {quickGoals.map((q) => (
+                  <button
+                    key={q}
+                    type="button"
+                    onClick={() => { setGoal(q); }}
+                    className="text-[10px] uppercase font-bold px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-red-500/50 transition-colors text-zinc-400 hover:text-white"
                   >
-                    <option>Principiante</option>
-                    <option>Intermedio</option>
-                    <option>Avanzado</option>
-                    <option>Atleta de Élite</option>
-                  </select>
-                </div>
-                
-                <button 
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 py-5 rounded-2xl font-black text-lg uppercase tracking-tighter transition-all flex items-center justify-center space-x-3 disabled:opacity-50 shadow-xl shadow-red-600/20"
+                    {q}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="space-y-2">
+                <label className="block text-xs font-black uppercase text-zinc-500 tracking-widest ml-1">Nivel de Condición Física</label>
+                <select 
+                  value={level}
+                  onChange={(e) => setLevel(e.target.value)}
+                  className="w-full bg-zinc-800 border border-white/5 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-white font-medium appearance-none"
                 >
-                  {loading ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin"></i>
-                      <span>Sincronizando con el Box...</span>
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-bolt"></i>
-                      <span>Generar Plan Maestro</span>
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
+                  <option>Principiante</option>
+                  <option>Intermedio</option>
+                  <option>Avanzado</option>
+                  <option>Atleta de Élite</option>
+                </select>
+              </div>
+              
+              <button 
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 py-5 rounded-2xl font-black text-lg uppercase tracking-tighter transition-all flex items-center justify-center space-x-3 disabled:opacity-50 shadow-xl shadow-red-600/20"
+              >
+                {loading ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i>
+                    <span>Analizando en el Box...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-bolt"></i>
+                    <span>Generar Plan Maestro</span>
+                  </>
+                )}
+              </button>
+            </form>
           </div>
           
           <div className="min-h-[500px] flex items-start justify-center">
